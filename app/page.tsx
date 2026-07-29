@@ -4,6 +4,8 @@ import { useMemo, useRef, useState } from "react";
 
 type Screen = "home" | "check" | "records" | "xray" | "chat";
 
+const assetBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const navItems: { id: Screen; label: string; icon: string }[] = [
   { id: "home", label: "홈", icon: "⌂" },
   { id: "check", label: "건강검진", icon: "✚" },
@@ -420,7 +422,7 @@ function XrayScreen({ region, setRegion }: { region: keyof typeof regions; setRe
         >
           <img
             className="coastMap"
-            src={`/maps/${geo.slug}.png`}
+            src={`${assetBasePath}/maps/${geo.slug}.png`}
             alt={`${region} 실제 해안선 지도`}
             draggable={false}
           />
