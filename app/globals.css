@@ -100,6 +100,19 @@ button { cursor: pointer; }
 .xrayOverlay { position: relative; z-index: 3; }.xrayOverlay .eyebrow { color: var(--cyan); }.xrayOverlay h3 { font-size: 18px; line-height: 1.45; margin: 0 0 30px; }.xrayOverlay button { border: 1px solid #2ed2dc62; background: #071b2eb8; color: #58e6e3; border-radius: 9px; padding: 9px 13px; font-size: 10px; }.liveBadge { position: absolute; right: 16px; bottom: 14px; font-size: 8px; color: #70d9e5; letter-spacing: 1px; }.liveBadge i { display: inline-block; width: 5px; height: 5px; background: #25e1ce; border-radius: 50%; margin-right: 5px; }
 
 .pageIntro { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }.pageIntro h2 { margin: 0; font-size: 28px; letter-spacing: -1.2px; }.pageIntro > div > p:last-child { color: #8292a4; font-size: 11px; margin: 7px 0 0; }.outlineBtn { background: white; border: 1px solid var(--line); color: #4c6176; }.saveReportBtn { display: inline-flex; align-items: center; justify-content: center; }
+.reportActions { display: flex; align-items: center; gap: 8px; }
+.cloudSaveBtn { min-height: 43px; }
+.cloudSaveBtn:disabled { cursor: not-allowed; opacity: .52; transform: none; box-shadow: none; }
+.saveNotice { margin: -9px 0 13px; padding: 10px 13px; border: 1px solid #cce0f4; border-radius: 11px; background: #eef7ff; color: #55728d; font-size: 9px; }
+.saveNotice.error { border-color: #ffd0ce; background: #fff1f0; color: #b64a45; }
+.savedRecordsCard { margin: 14px 0; padding: 21px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 7px 22px #15324d09; }
+.cloudBadge { padding: 6px 10px; border-radius: 18px; background: #e8f7ff; color: #1677c8; font-size: 9px; font-weight: 800; }
+.emptySaved { margin: 17px 0 0; padding: 18px; border-radius: 13px; background: #f6f9fc; color: #7d90a3; font-size: 10px; text-align: center; }
+.savedRecordList { display: grid; gap: 8px; margin-top: 16px; }
+.savedRecordList article { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px; border: 1px solid #e1eaf2; border-radius: 12px; background: #fbfdff; }
+.savedRecordList strong,.savedRecordList small { display: block; }.savedRecordList strong { font-size: 11px; }.savedRecordList div small { margin-top: 4px; color: #8799aa; font-size: 8px; }
+.savedRecordList b { color: var(--blue); font-size: 20px; }.savedRecordList b small { display: inline; margin-left: 2px; font-size: 8px; }
+.recordDeviceNote { display: block; margin-top: 11px; color: #93a3b1; font-size: 8px; }
 .reportDocument { display: contents; }
 .reportHeader { min-height: 225px; display: flex; justify-content: space-between; align-items: center; border-radius: 22px; background: linear-gradient(120deg, #0b223d, #0c4166); color: white; padding: 34px 42px; position: relative; overflow: hidden; margin-bottom: 14px; }
 .reportHeader:after { content:""; position:absolute; width: 420px; height: 420px; border: 1px solid #40e8e92b; border-radius: 50%; right: -160px; top: -90px; box-shadow: 0 0 0 60px #1ad5de0a, 0 0 0 120px #1ad5de07; }
@@ -179,7 +192,7 @@ button { cursor: pointer; }
   .bottomNav button { border: 0; background: transparent; color: #8191a2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }.bottomNav span { font-size: 20px; line-height: 1; }.bottomNav small { font-size: 8px; font-weight: 700; }.bottomNav button.active { color: var(--blue); }
   .heroCard { min-height: auto; padding: 25px 22px; grid-template-columns: 1fr; gap: 25px; border-radius: 21px; }.heroScore { grid-row: 1; }.scoreRing { width: 150px; height: 150px; }.scoreInner strong { font-size: 49px; }.heroScore > div:last-child { margin-top: 14px; }.heroCopy h2 { font-size: 27px; letter-spacing: -1.4px; }.heroCopy > p { font-size: 11px; }.heroButtons { display: grid; grid-template-columns: 1fr 1fr; }.primaryBtn, .ghostBtn { padding: 0 11px; }
   .metricGrid { grid-template-columns: repeat(2, 1fr); }.metricCard { padding: 15px; }.sectionHead { margin-top: 24px; }.sectionHead h3 { font-size: 17px; }.homeBottom { grid-template-columns: 1fr; }
-  .pageIntro { align-items: flex-start; }.pageIntro h2 { font-size: 23px; }.pageIntro .outlineBtn { display: none; }.pageIntro .saveReportBtn { display: inline-flex; min-height: 38px; padding: 0 12px; white-space: nowrap; }
+  .pageIntro { align-items: flex-start; gap: 10px; }.pageIntro h2 { font-size: 23px; }.pageIntro .outlineBtn { display: none; }.pageIntro .saveReportBtn { display: inline-flex; min-height: 38px; padding: 0 12px; white-space: nowrap; }.reportActions { flex-direction: column; align-items: stretch; }.cloudSaveBtn { min-height: 38px; padding: 0 11px; white-space: nowrap; }
   .reportHeader { padding: 26px 22px; display: grid; gap: 24px; }.reportScore { min-width: 0; }.diagnosisCard { grid-template-columns: 1fr; gap: 17px; }.findingRow { grid-template-columns: 1fr; }
   .miniBars { gap: 5px; padding-left: 0; padding-right: 0; }.barColumn small { writing-mode: vertical-rl; bottom: -30px; }.chartLegend { margin-top: 37px; }.recordBottom { grid-template-columns: 1fr; }.compareScore { gap: 12px; }.compareScore > div { padding: 12px 22px; }
   .xrayMode { padding-bottom: 69px; }.xrayPage { padding: 16px 12px 12px; }.xrayPage .pageIntro { padding: 0 5px; }.xrayPage .pageIntro h2 { font-size: 20px; }.xrayPage .pageIntro > div:first-child > p:last-child { display: none; }.xrayIntroActions { align-items: center; }.xrayIntroActions label span,.xrayIntroActions .scanStatus { display: none; }.xrayIntroActions select { min-width: 126px; height: 32px; }.scanStatus { padding: 7px; }

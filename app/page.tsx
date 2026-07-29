@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  isFirebaseReady,
+  loadHealthChecks,
+  saveHealthCheck,
+  type SavedHealthCheck,
+} from "./firebase-health-records";
 
 type Screen = "home" | "check" | "records" | "xray" | "chat";
 
@@ -298,15 +304,42 @@ function HomeScreen({ region, go }: { region: keyof typeof regions; go: (s: Scre
 
 function CheckScreen({ region }: { region: keyof typeof regions }) {
   const info = regions[region];
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const saveReport = () => {
     const originalTitle = document.title;
     document.title = `Ocean Check_${region}_건강검진리포트`;
     window.print();
     window.setTimeout(() => { document.title = originalTitle; }, 500);
   };
+  const saveRecord = async () => {
+    setSaveState("saving");
+    try {
+      await saveHealthCheck({
+        region,
+        score: info.score,
+        status: info.status,
+        checkedAt: new Date().toISOString(),
+        metrics: getMetricValues(info.score).map(({ label, score, weight }) => ({ label, score, weight })),
+        notes: ["미세플라스틱 농도 증가", "연안 해양 쓰레기 발견", "산호·저서생물 회복세"],
+      });
+      setSaveState("saved");
+    } catch {
+      setSaveState("error");
+    }
+  };
   return (
     <div className="screenContent enter">
-      <div className="pageIntro"><div><p className="eyebrow">OCEAN HEALTH CHECK</p><h2>해양 건강검진 결과</h2><p>{region} · 2026년 7월 정기검진</p></div><button className="outlineBtn saveReportBtn" onClick={saveReport}>PDF로 저장 ↓</button></div>
+      <div className="pageIntro">
+        <div><p className="eyebrow">OCEAN HEALTH CHECK</p><h2>해양 건강검진 결과</h2><p>{region} · 2026년 7월 정기검진</p></div>
+        <div className="reportActions">
+          <button className="primaryBtn cloudSaveBtn" onClick={saveRecord} disabled={!isFirebaseReady || saveState === "saving"}>
+            {saveState === "saving" ? "저장 중…" : saveState === "saved" ? "저장 완료 ✓" : "검사 기록 저장"}
+          </button>
+          <button className="outlineBtn saveReportBtn" onClick={saveReport}>PDF로 저장 ↓</button>
+        </div>
+      </div>
+      {saveState === "error" && <p className="saveNotice error">저장하지 못했습니다. Firebase 연결 상태를 확인해주세요.</p>}
+      {!isFirebaseReady && <p className="saveNotice">Firebase 프로젝트 연결 후 검사 기록을 안전하게 저장할 수 있습니다.</p>}
       <div className="reportDocument" id="health-report">
         <section className="reportHeader">
           <div className="reportIdentity"><span className="reportNo">검진번호 OC-260724-017</span><h3>{region} 해양 건강진단서</h3><p>AI가 42개 해양 관측 지표를 종합 분석했습니다.</p><StatusPill score={info.score}>{info.status} · 추적 관찰</StatusPill></div>
@@ -326,9 +359,18 @@ function CheckScreen({ region }: { region: keyof typeof regions }) {
   );
 }
 
-function RecordsScreen() {
+function RecordsScreen({ region }: { region: keyof typeof regions }) {
   const [year, setYear] = useState<keyof typeof yearlyRecords>(2026);
+  const [savedChecks, setSavedChecks] = useState<SavedHealthCheck[]>([]);
+  const [loadingChecks, setLoadingChecks] = useState(isFirebaseReady);
   const record = yearlyRecords[year];
+  useEffect(() => {
+    if (!isFirebaseReady) return;
+    loadHealthChecks()
+      .then(setSavedChecks)
+      .catch(() => setSavedChecks([]))
+      .finally(() => setLoadingChecks(false));
+  }, []);
   return (
     <div className="screenContent enter">
       <div className="pageIntro"><div><p className="eyebrow">OCEAN HEALTH RECORD</p><h2>건강기록부</h2><p>부산 연안의 장기 건강 변화를 추적합니다.</p></div><div className="yearTabs">{([2026, 2025, 2024] as const).map((item) => <button key={item} className={year === item ? "active" : ""} onClick={() => setYear(item)} aria-pressed={year === item}>{item}</button>)}</div></div>
@@ -336,6 +378,18 @@ function RecordsScreen() {
         <div className="cardTop"><div><p className="eyebrow">MONTHLY SCORE · {year}</p><h3>{year}년 월별 건강점수 변화</h3></div><div className="scoreDelta"><strong>{record.score}점</strong><span>{record.delta}</span></div></div>
         <MiniBars values={record.values} />
         <div className="chartLegend"><span><i className="cyan" /> 건강점수</span><span><i className="dashed" /> 동일 해역 평균 76점</span></div>
+      </section>
+      <section className="savedRecordsCard">
+        <div className="cardTop"><div><p className="eyebrow">FIREBASE RECORDS</p><h3>저장된 검사 기록</h3></div><span className="cloudBadge">☁ {savedChecks.length}건</span></div>
+        {loadingChecks && <p className="emptySaved">저장된 기록을 불러오는 중입니다.</p>}
+        {!loadingChecks && savedChecks.length === 0 && <p className="emptySaved">{isFirebaseReady ? "아직 저장된 검사가 없습니다. 건강검진 결과에서 첫 기록을 저장해보세요." : "Firebase 프로젝트를 연결하면 검사 기록이 여기에 표시됩니다."}</p>}
+        {savedChecks.length > 0 && <div className="savedRecordList">{savedChecks.map((check) => (
+          <article key={check.id}>
+            <div><strong>{check.region}</strong><small>{new Date(check.checkedAt).toLocaleDateString("ko-KR")} · {check.status}</small></div>
+            <b>{check.score}<small>점</small></b>
+          </article>
+        ))}</div>}
+        {savedChecks.length > 0 && <small className="recordDeviceNote">현재 브라우저에 연결된 비공개 저장함입니다. 선택 해역: {region}</small>}
       </section>
       <section className="recordBottom">
         <article className="compareCard">
@@ -548,7 +602,7 @@ export default function Home() {
         <div className="mobileTitle">{title}</div>
         {screen === "home" && <HomeScreen region={region} go={setScreen} />}
         {screen === "check" && <CheckScreen region={region} />}
-        {screen === "records" && <RecordsScreen />}
+        {screen === "records" && <RecordsScreen region={region} />}
         {screen === "xray" && <XrayScreen region={region} setRegion={setRegion} />}
         {screen === "chat" && <ChatScreen />}
       </section>
