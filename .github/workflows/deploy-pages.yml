@@ -21,20 +21,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build static site
-        run: npm run build:pages
+        run: pnpm run build:pages
         env:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_BASE_PATH: "/ocean-check-ai-health"
+          NEXT_PUBLIC_FIREBASE_API_KEY: "AIzaSyDfSFMck0-7Yvp45uwk0XbxAa3Q8ntT8Ss"
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "ocean-check-ai-health.firebaseapp.com"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "ocean-check-ai-health"
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "ocean-check-ai-health.firebasestorage.app"
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "475869479963"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:475869479963:web:76c2a73bd2c24e43dd64be"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
